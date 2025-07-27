@@ -66,7 +66,7 @@
  [],
  False,
  False,
- 1753603329,
+ 1753655642,
  [('run.exe',
    'C:\\Users\\Luan '
    'Bogo\\AppData\\Roaming\\Python\\Python313\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
