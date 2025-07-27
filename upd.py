@@ -1,4 +1,4 @@
-#Importar Bibilhotecas
+#Importar Bibliotecas
 import os
 from shutil import move, rmtree
 from glob import glob
@@ -58,9 +58,7 @@ rmtree('Lixo')
 
 os.chdir('Arquivos')
 for fileglb in glob('*.*'):
-    for fileglb in file:
-        os.remove(file)
-
+    os.remove(fileglb)
 os.chdir('..')
 for ext in extespc:
     for file in glob(ext):
@@ -124,25 +122,21 @@ if os.path.exists('dll'):
     rmtree('dll')
 
 print("*** Atualizando as DLLs do EFServer ***")
-if os.path.exists('dll'):
-    rmtree('dll')
-os.system('dll.exe')
+def atualizar_dlls_efserver(destino_path):
+    print("*** Atualizando as DLLs do EFServer ***")
+    if os.path.exists('dll'):
+        rmtree('dll')
+    os.system('dll.exe')
+    if os.path.exists('dll'):
+        for file in glob(os.path.join('dll', '*.*')):
+            move(file, destino_path)
+        rmtree('dll')
+
 efserver_path = os.path.abspath(os.path.join('..', '..', 'EFServer'))
-if os.path.exists('dll'):
-    for file in glob(os.path.join('dll', '*.*')):
-        move(file, efserver_path)
-    rmtree('dll')
+atualizar_dlls_efserver(efserver_path)
 
-print("*** Atualizando as DLLs do EFServer ***")
-if os.path.exists('dll'):
-    rmtree('dll')
-os.system('dll.exe')
 efserver_path2 = os.path.abspath(os.path.join('..', 'EFServer'))
-if os.path.exists('dll'):
-    for file in glob(os.path.join('dll', '*.*')):
-        move(file, efserver_path2)
-    rmtree('dll')
-
+atualizar_dlls_efserver(efserver_path2)
 print("*** Atualizando Schemas ***")
 if os.path.exists('Schemas'):
     rmtree('Schemas')
@@ -223,3 +217,5 @@ for file in glob(os.path.join('..', 'EFUpdate', 'Versao Beta', '*zip')):
 
 print("*** Iniciando Backup em segundo plano ***")
 os.system('start "" /b cmd')
+print("*** Iniciando Backup em segundo plano ***")
+os.system('start "" /b cmd /c "limpabackup.bat"')
