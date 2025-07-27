@@ -1,5 +1,7 @@
 #Importar Bibliotecas
 import os
+import sys
+import platform
 from shutil import move, rmtree
 from glob import glob
 from zipfile import ZipFile
@@ -7,12 +9,10 @@ from zipfile import ZipFile
 extsimp = [
     '*.ini', '*.doc', '*.exe', '*.chm', '*.txt', '*.log'
 ]
-
 extdoc = [
     '*.pdf', '*.csv', '*.xls', '*.rpf', '*.rar', '*.zip'
 ]
-
-extespc = [
+extspc = [
     'Plano de Contas Básico.doc', 'Formatos dos Códigos.doc',
     'EFBackup1160010.exe', 'EFBackup1160011.exe', 'IBPT.exe',
     'Eficaz3*.exe', 'Eficaz - old*.exe', '*old*.exe', 'Eficaz4*.exe',
@@ -39,34 +39,59 @@ extespc = [
     'EFUpdate/"Versao Beta"/*zip'
 ]
 
-
 print("Efetuando Limpeza de Base")
 os.chdir('..')
+if not os.path.exists('Lixo'):
+    os.mkdir('Lixo')
 os.mkdir('Lixo')
 
+#Jogar todos os arquivos com as extenções listadas na "extdoc" para a pasta Lixo.
 for ext in extdoc:
     for file in glob(ext):    
         move(file,f'Lixo/{file}')
 
-
+#Zipar a Pasta Lixo para minimizar o tamanho e apos apagar a pasta.
+##Aviso para luan do futuro: arrumar um jeito de zipar recursivamente
 with ZipFile('Lixo.zip', 'w') as fzip:
     os.chdir('Lixo')
     for file in glob('*.*'):
         fzip.write(file)
     os.chdir('..')
-rmtree('Lixo')
+    rmtree('Lixo')
 
+#(. -> Arquivos [./Arquivos])
+#AVISO para luan do futuro: descobrir como buzanfas que
+#essa linha da dando erro para entrar dentro desse diretorio.
 os.chdir('Arquivos')
 for fileglb in glob('*.*'):
+    try:
+        os.remove(fileglb)
+    except Exception as e:
+        print(f"Erro ao remover {fileglb}: {e}")
+for fileglb in glob('*.*'):
     os.remove(fileglb)
-os.chdir('..')
-for ext in extespc:
+for ext in extspc:
+    for file in glob(ext):
+        try:
+            if os.path.isfile(file):
+                os.remove(file)
+            elif os.path.isdir(file):
+                rmtree(file)
+        except Exception as e:
+            print(f"Erro ao remover {file}: {e}")
     for file in glob(ext):
         if os.path.isfile(file):
             os.remove(file)
         elif os.path.isdir(file):
             rmtree(file)
+
+#(. -> Arquivos [./Arquivos])
 os.chdir('Arquivos')
+
+#AVISO para luan do futuro: Tentar implementar a bibilhoteca subprocess.
+
+#Começar a subistituir DLL's ou Colocar novas DLL's no sistema. aproveitando pra executar algumas
+#linhas no terminal em si
 os.startfile('Capicom.exe')
 
 # A partir da linha 86 do .bat (ECHO *** Atualizando Capicom ***)
@@ -75,7 +100,7 @@ if os.path.exists('Capicom'):
     rmtree('Capicom')
 os.system('Capicom.exe')
 
-import platform
+
 
 # Detecta arquitetura do Windows
 is_64bits = platform.machine().endswith('64')
@@ -183,6 +208,11 @@ if os.path.exists('Schemas-DFe'):
 schemas_dfe_parent = os.path.abspath(os.path.join('..', 'Schemas-DFe'))
 if os.path.exists(schemas_dfe_parent):
     rmtree(schemas_dfe_parent)
+for file in glob(os.path.join('..', 'Atualizacao', '*.sql')):
+    try:
+        os.remove(file)
+    except Exception as e:
+        print(f"Erro ao remover {file}: {e}")
 os.system('Schemas-DFe.exe')
 if os.path.exists('Schemas-DFe'):
     move('Schemas-DFe', os.path.abspath('..'))
@@ -199,10 +229,16 @@ for openssl_file in ['openssl.cnf', 'openssl.exe']:
         move(origem, destino)
 
 print("*** Atualizando Help ***")
-help_src = os.path.join('..', 'EFUpdate', 'EficazHelp.chm')
-help_dst = os.path.join('..', 'EficazHelp.chm')
-if os.path.exists(help_src):
-    move(help_src, help_dst)
+for file in glob(os.path.join('..', 'EFUpdate', 'Servicos', '*zip')):
+    try:
+        os.remove(file)
+    except Exception as e:
+        print(f"Erro ao remover {file}: {e}")
+for file in glob(os.path.join('..', 'EFUpdate', 'Versao Beta', '*zip')):
+    try:
+        os.remove(file)
+    except Exception as e:
+        print(f"Erro ao remover {file}: {e}")
 
 print("Copiando TrocaExe.bat para EFUpdate")
 trocaexe_src = 'TrocaExe.bat'
